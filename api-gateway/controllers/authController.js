@@ -3,16 +3,10 @@ var jwt = require('jsonwebtoken');
 var bcrypt = require('bcryptjs');
 var config = require('../config');
 
-exports.user_register = function(req, res){
-    res.send('NOT IMPLEMENTED: User Registration POST');
-};
 
-exports.user_token = function(req, res){
-    res.send('NOT IMPLEMENTED: User Token Lookup GET');
-};
-// Register on new user POST
-exports.user_register = function (req, res) {
-    
+// Register a new user on POST
+exports.user_register = function(req, res) {
+
     var hashedPassword = bcrypt.hashSync(req.body.password, 8);
 
     var newUser = new User({
@@ -21,7 +15,7 @@ exports.user_register = function (req, res) {
         email: req.body.email
     });
 
-    User.add(newUser, (err, user) =>{
+    User.add(newUser, (err, user) => {
         if (err)
             return res.status(500).send('There was a problem registering the user.');
 
@@ -29,20 +23,19 @@ exports.user_register = function (req, res) {
             expiresIn: 86400 // 24 hours
         });
 
-        res.status(200).send({ auth: true, token: token});
+        res.status(200).send({ auth: true, token: token });
     });
-
 };
 
-//Verify token on GET
+// Verify token on GET
 exports.user_token = function(req, res) {
-    
+
     var token = req.headers['x-access-token'];
 
-    if (!token) return res.status(401).send({ auth: false, messge: 'No token provided.'});
+    if (!token) return res.status(401).send({ auth: false, message: 'No token provided'});
 
     jwt.verify(token, config.web.secret, function(err, decoded) {
-        if (err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.'});
+        if (err) return res.status(500).send({auth: false, message: 'Failed to authenticate token.'});
 
         User.getById(decoded.id, function(err, user) {
             if (err) return res.status(500).send('There was a problem finding the user.');
@@ -51,5 +44,6 @@ exports.user_token = function(req, res) {
 
             res.status(200).send(user);
         });
+
     });
 };
