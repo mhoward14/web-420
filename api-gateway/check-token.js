@@ -16,7 +16,7 @@ function checkToken(req, res, next) {
     jwt.verify(token, config.web.secret, function(err, decoded){
         if (err) return res.status(500).send({auth: false, message: 'Failed to authenticate token.'});
 
-        req.useerId = decoded.id;
+        req.userId = decoded.id;
         next();
     });
 };
